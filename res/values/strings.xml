@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="hello">Hello World, TrackingActivity!</string>
+    <string name="app_name">Tracking</string>
+    <string name="local_service_started">Location tracking</string>
+	<string name="toggle_on">Only GPS</string>
+	<string name="toggle_off">All providers</string>
+	<string name="alert_dialog_two_buttons_title">GPS?</string>
+</resources>

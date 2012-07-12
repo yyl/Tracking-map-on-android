@@ -1,0 +1,121 @@
+package com.yyl.myrmex.tracking;
+
+
+import android.app.Notification;
+// for level below 11
+import android.support.v4.app.NotificationCompat;
+import android.app.NotificationManager;
+import android.app.PendingIntent;
+import android.app.Service;
+import android.content.Intent;
+import android.location.Criteria;
+import android.location.LocationManager;
+import android.os.Handler;
+import android.os.HandlerThread;
+import android.os.IBinder;
+import android.os.Looper;
+import android.os.Message;
+import android.widget.Toast;
+import android.os.Process;
+
+public class MyService extends Service {
+    private NotificationManager mNM;
+    private Looper mServiceLooper;
+    private ServiceHandler mServiceHandler;
+    // Unique Identification Number for the Notification.
+    // We use it on Notification start, and to cancel it.
+    private int NOTIFICATION = R.string.local_service_started;
+	private LocationManager mgr;
+	private String best;
+	private Locationer locationer;
+	private NotificationCompat.Builder builder;
+	
+	  // Handler that receives messages from the thread
+	  private final class ServiceHandler extends Handler {
+	      public ServiceHandler(Looper looper) {
+	          super(looper);
+	      }
+	      @Override
+	      public void handleMessage(Message msg) {
+	          mgr = (LocationManager) getSystemService(LOCATION_SERVICE);          
+	          Criteria criteria = new Criteria();
+	          best = mgr.getBestProvider(criteria, true);
+	          locationer = new Locationer(getBaseContext());
+	          mgr.requestLocationUpdates(best, 30000, 0, locationer);
+	      }
+	  }
+
+	  @Override
+	  public void onCreate() {
+	    mNM = (NotificationManager)getSystemService(NOTIFICATION_SERVICE);
+
+	    // Display a notification about us starting.  We put an icon in the status bar.
+	    showNotification();
+	    // Start up the thread running the service.  Note that we create a
+	    // separate thread because the service normally runs in the process's
+	    // main thread, which we don't want to block.  We also make it
+	    // background priority so CPU-intensive work will not disrupt our UI.
+	    HandlerThread thread = new HandlerThread("ServiceStartArguments", Process.THREAD_PRIORITY_BACKGROUND);
+	    thread.start();
+	    
+	    // Get the HandlerThread's Looper and use it for our Handler 
+	    mServiceLooper = thread.getLooper();
+	    mServiceHandler = new ServiceHandler(mServiceLooper);
+	  }
+
+	  @Override
+	  public int onStartCommand(Intent intent, int flags, int startId) {
+	      Toast.makeText(this, "local service is started ", Toast.LENGTH_SHORT).show();
+
+	      // For each start request, send a message to start a job and deliver the
+	      // start ID so we know which request we're stopping when we finish the job
+	      Message msg = mServiceHandler.obtainMessage();
+	      msg.arg1 = startId;
+	      mServiceHandler.sendMessage(msg);
+	      
+	      // If we get killed, after returning from here, restart
+	      return START_STICKY;
+	  }
+	  
+	    
+	  @Override
+	  public void onDestroy() {
+		  // Cancel the persistent notification.
+		  mNM.cancel(NOTIFICATION);
+		  mgr.removeUpdates(locationer);
+	      // Tell the user we stopped.
+	      Toast.makeText(this, "local service is stopped", Toast.LENGTH_SHORT).show();
+	  }
+	  
+
+	  @Override
+	  public IBinder onBind(Intent intent) {
+	      // We don't provide binding, so return null
+	      return null;
+	  }
+	  
+	    /**
+	     * Show a notification while this service is running.
+	     */
+	    private void showNotification() {
+	        // In this sample, we'll use the same text for the ticker and the expanded notification
+	        CharSequence text = getText(R.string.local_service_started);
+	        // The PendingIntent to launch our activity if the user selects this notification
+	        PendingIntent contentIntent = PendingIntent.getActivity(this, 0,
+	                new Intent(this, TrackingActivity.class), 0);
+	        
+	        builder = new NotificationCompat.Builder(getBaseContext())
+	         .setContentTitle("You are being tracked...")
+	         .setContentText(text)
+	         .setSmallIcon(R.drawable.ic_launcher)
+	         .setContentIntent(contentIntent)
+	         .setOngoing(true);
+
+	        Notification notification = builder.getNotification();
+	        
+	        // Send the notification.
+	        mNM.notify(NOTIFICATION, notification);
+	    }
+
+	    
+}

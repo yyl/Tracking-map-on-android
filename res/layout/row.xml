@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android" 
+    android:layout_width="fill_parent" 
+    android:layout_height="fill_parent" 
+    android:orientation="horizontal"
+	android:padding="5dp" >
+
+<TextView
+	android:id="@+id/time" 
+	android:layout_width="wrap_content" 
+	android:layout_height="wrap_content" 
+	android:layout_toRightOf="@+id/rowidcolon" />
+
+<TextView
+	android:id="@+id/timecolon" 
+	android:layout_width="wrap_content" 
+	android:layout_height="wrap_content" 
+	android:text="| " 
+	android:layout_toRightOf="@+id/time" />
+
+<TextView
+	android:id="@+id/latitude" 
+	android:layout_width="wrap_content" 
+	android:layout_height="wrap_content" 
+	android:layout_toRightOf="@+id/timecolon" />
+
+
+<TextView
+	android:id="@+id/longcolon" 
+	android:layout_width="wrap_content" 
+	android:layout_height="wrap_content" 
+	android:text="| " 
+	android:layout_toRightOf="@+id/latitude" />
+
+<TextView
+	android:id="@+id/longitude" 
+	android:layout_width="wrap_content" 
+	android:layout_height="wrap_content" 
+	android:layout_toRightOf="@+id/longcolon" />
+
+￼</RelativeLayout>
