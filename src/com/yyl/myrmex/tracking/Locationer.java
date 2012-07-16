@@ -7,6 +7,7 @@ import java.util.TimeZone;
 
 import com.yyl.myrmex.tracking.database.LocContentProvider;
 import com.yyl.myrmex.tracking.database.LocTable;
+import com.yyl.myrmex.tracking.places.MyPlaces;
 
 import android.content.ContentValues;
 import android.content.Context;
@@ -18,6 +19,7 @@ import android.widget.Toast;
 class Locationer implements LocationListener {
 
 	private Context ctx;
+	private MyPlaces mplace;
 	
 	public Locationer(Context context) {
 		ctx = context;
@@ -56,8 +58,6 @@ class Locationer implements LocationListener {
         	builder
         	.append("Prvdr:")
     		.append(location.getProvider()) 
-//        	.append("|Time:")
-//    		.append(parseTime(location.getTime())) 
     		.append("|Speed:" ) 
     		.append(location.getSpeed()) 
     		.append("|Accu:" ) 
@@ -76,7 +76,6 @@ class Locationer implements LocationListener {
 		String time;
 		String extra;
 		String places = "Place:N/A";
-		String venues = "Venue:N/A";
 		String result = "Location currently unavailable.";
 		
 		// get coordinates
@@ -86,14 +85,11 @@ class Locationer implements LocationListener {
 		extra = dumpLocation(location);
 		result = Double.toString(latitude)+", "+ Double.toString(longitude);
 		// get places
-//		try {
-//			places = mplace.searchPlaces(longitude, latitude, 300);
-//			venues = mplace.searchVenues(result);
-//		} catch (Exception e) {
-//			e.printStackTrace();
-//		}
-		// connect with the web app
-//		mplace.sendData(latitude, longitude);
+		try {
+			places = mplace.searchPlaces(longitude, latitude, 300);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 		// put them into db
 		ContentValues values = new ContentValues(); 
 		values.put(LocTable.COLUMN_TIME, time); 
@@ -101,7 +97,6 @@ class Locationer implements LocationListener {
 		values.put(LocTable.COLUMN_LONGITUDE, longitude);
 		values.put(LocTable.COLUMN_EXTRA, extra);
 		values.put(LocTable.COLUMN_PLACES, places);
-		values.put(LocTable.COLUMN_VENUES, venues);
 		ctx.getContentResolver().insert(LocContentProvider.CONTENT_URI, values);
 		
 		Toast.makeText(ctx, result, Toast.LENGTH_SHORT).show();
@@ -110,7 +105,6 @@ class Locationer implements LocationListener {
 	private String parseTime(long t) {
 		String format = "yyyy-MM-dd HH:mm:ss";
 		SimpleDateFormat sdf = new SimpleDateFormat(format, Locale.US);
-//		DateFormat df = DateFormat.getTimeInstance(DateFormat.MEDIUM);
 		sdf.setTimeZone(TimeZone.getTimeZone("GMT-4"));
 		String gmtTime = sdf.format(t);
 		return gmtTime;

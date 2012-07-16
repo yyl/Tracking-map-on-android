@@ -132,7 +132,7 @@ public class DatabaseExporter {
 
       void addColumn(final String name, final String val) throws IOException {
 //         this.sb.append(COL_OPEN + name + CLOSE_WITH_TICK + val + COL_CLOSE);
-    	  this.sb.append(val + COL_CLOSE);
+    	  this.sb.append(name + ": " + val + COL_CLOSE);
       }
    }
 }
