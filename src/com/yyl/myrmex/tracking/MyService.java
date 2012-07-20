@@ -70,10 +70,10 @@ public class MyService extends Service {
 	          String providerCoarse = mgr.getBestProvider(criteria, true);
 	           
 	          if (providerCoarse != null) {
-	              mgr.requestLocationUpdates(providerCoarse, 0, 0, network_locationer);
+	              mgr.requestLocationUpdates(providerCoarse, 30000, 5, network_locationer);
 	          }
 	          if (providerFine != null) {
-	              mgr.requestLocationUpdates(providerFine, 10000, 5, gps_locationer);
+	              mgr.requestLocationUpdates(providerFine, 2000, 0, gps_locationer);
 	          }
 	      }
 	  }

@@ -28,6 +28,7 @@ class Locationer implements LocationListener {
 	
 	private static final String DEBUG_TAG = "Locationer";
 	private static final String[] Status = {"out of service", "temporarily unavailable", "available"};
+	private static final double ACCU_THRESHOLD = 100.0;
 	
 	public Locationer(Context context) {
 		ctx = context;
@@ -38,7 +39,7 @@ class Locationer implements LocationListener {
 	@Override
 	public void onLocationChanged(Location location) {
 		Intent intent = new Intent("locationer");
-        if (location == null) {
+        if ((location == null)||(location.getAccuracy() > ACCU_THRESHOLD)) {
         	mu.appendLog(DEBUG_TAG, "location unavailable.");
         	return;
         }
