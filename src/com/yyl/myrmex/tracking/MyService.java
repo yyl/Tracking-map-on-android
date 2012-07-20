@@ -51,8 +51,8 @@ public class MyService extends Service {
 	          mgr = (LocationManager) getSystemService(LOCATION_SERVICE);          
 	          gps_locationer = new Locationer(getBaseContext());
 	          network_locationer = new Locationer(getBaseContext());
-	          gpslistener = new gpsStatusListener();
-	          mgr.addGpsStatusListener(gpslistener);
+//	          gpslistener = new gpsStatusListener();
+//	          mgr.addGpsStatusListener(gpslistener);
 //	          mgr.requestLocationUpdates(LocationManager.GPS_PROVIDER, 15000, 5, gps_locationer);
 //	          mgr.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 15000, 5, gps_locationer);
 ////	          Location lastKnownLocation = mgr.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
@@ -70,10 +70,10 @@ public class MyService extends Service {
 	          String providerCoarse = mgr.getBestProvider(criteria, true);
 	           
 	          if (providerCoarse != null) {
-	              mgr.requestLocationUpdates(providerCoarse, 15000, 10, network_locationer);
+	              mgr.requestLocationUpdates(providerCoarse, 0, 0, network_locationer);
 	          }
 	          if (providerFine != null) {
-	              mgr.requestLocationUpdates(providerFine, 15000, 10, gps_locationer);
+	              mgr.requestLocationUpdates(providerFine, 10000, 5, gps_locationer);
 	          }
 	      }
 	  }

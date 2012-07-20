@@ -42,7 +42,7 @@ class Locationer implements LocationListener {
         	mu.appendLog(DEBUG_TAG, "location unavailable.");
         	return;
         }
-        mu.appendLog(DEBUG_TAG, "onLocationChanged method invoked");
+        mu.appendLog(DEBUG_TAG, "onLocationChanged method invoked by " + location.getProvider());
         mLastLocationMillis = SystemClock.elapsedRealtime();
         mLastLocation = location;
         
