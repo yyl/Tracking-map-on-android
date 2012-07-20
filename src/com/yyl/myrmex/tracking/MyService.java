@@ -16,6 +16,7 @@ import android.content.IntentFilter;
 import android.location.Criteria;
 import android.location.GpsStatus;
 import android.location.GpsStatus.Listener;
+import android.location.Location;
 import android.location.LocationManager;
 import android.os.Handler;
 import android.os.HandlerThread;
@@ -31,11 +32,9 @@ public class MyService extends Service {
     private Looper mServiceLooper;
     private ServiceHandler mServiceHandler;
     private int NOTIFICATION = R.string.local_service_started;
-    private boolean fixed;
     private long last_time;
 	private LocationManager mgr;
-	private String best;
-	private Locationer locationer;
+	private Locationer gps_locationer, network_locationer;
 	private NotificationCompat.Builder builder;
 	private MyUtility mu;
 	private gpsStatusListener gpslistener;
@@ -50,13 +49,32 @@ public class MyService extends Service {
 	      @Override
 	      public void handleMessage(Message msg) {
 	          mgr = (LocationManager) getSystemService(LOCATION_SERVICE);          
-	          Criteria criteria = new Criteria();
-	          best = mgr.getBestProvider(criteria, true);
-//	          best = LocationManager.GPS_PROVIDER;
-	          locationer = new Locationer(getBaseContext());
+	          gps_locationer = new Locationer(getBaseContext());
+	          network_locationer = new Locationer(getBaseContext());
 	          gpslistener = new gpsStatusListener();
 	          mgr.addGpsStatusListener(gpslistener);
-	          mgr.requestLocationUpdates(best, 5000, 5, locationer);
+//	          mgr.requestLocationUpdates(LocationManager.GPS_PROVIDER, 15000, 5, gps_locationer);
+//	          mgr.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 15000, 5, gps_locationer);
+////	          Location lastKnownLocation = mgr.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
+	          
+	          Criteria criteria = new Criteria();
+	          criteria.setAltitudeRequired(false);
+	          criteria.setBearingRequired(false);
+	          criteria.setCostAllowed(false);
+	          criteria.setPowerRequirement(Criteria.POWER_LOW);       
+	           
+	          criteria.setAccuracy(Criteria.ACCURACY_FINE);
+	          String providerFine = mgr.getBestProvider(criteria, true);
+	           
+	          criteria.setAccuracy(Criteria.ACCURACY_COARSE);
+	          String providerCoarse = mgr.getBestProvider(criteria, true);
+	           
+	          if (providerCoarse != null) {
+	              mgr.requestLocationUpdates(providerCoarse, 15000, 10, network_locationer);
+	          }
+	          if (providerFine != null) {
+	              mgr.requestLocationUpdates(providerFine, 15000, 10, gps_locationer);
+	          }
 	      }
 	  }
 
@@ -100,7 +118,8 @@ public class MyService extends Service {
 	  public void onDestroy() {
 		  // Cancel the persistent notification.
 		  mNM.cancel(NOTIFICATION);
-		  mgr.removeUpdates(locationer);
+		  mgr.removeUpdates(gps_locationer);
+		  mgr.removeUpdates(network_locationer);
 		  mgr.removeGpsStatusListener(gpslistener);
 	      // Tell the user we stopped.
 	      Toast.makeText(this, "local service is stopped", Toast.LENGTH_SHORT).show();

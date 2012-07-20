@@ -21,7 +21,7 @@ import android.location.GpsStatus.Listener;
 class Locationer implements LocationListener {
 
 	private Context ctx;
-	private MyPlaces mplace = new MyPlaces();
+	private MyPlaces mplace;
 	private Location mLastLocation;
 	private long mLastLocationMillis;
 	private MyUtility mu;
@@ -32,6 +32,7 @@ class Locationer implements LocationListener {
 	public Locationer(Context context) {
 		ctx = context;
 		mu = new MyUtility();
+		mplace = new MyPlaces();
 	}
 	
 	@Override
