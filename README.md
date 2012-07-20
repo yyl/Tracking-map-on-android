@@ -26,7 +26,6 @@ The old one still works, but from now I will only update this version.*
 
 ###Issues
 - You have to obtain your own google api key.
-- the shortest update interval (for GPS) is 10s.
 - map drawing not real time
 
 Feel free to fork it; have fun.
