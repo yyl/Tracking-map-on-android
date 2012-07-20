@@ -17,6 +17,8 @@ The old one still works, but from now I will only update this version.*
 ###Dependencies
 - Android support library: could downloaded via Android SDK manager
 - Google API Java client
+- Google Place API sample from [ddewaele][2], [updated][3] to be compatible with the
+  newest version of google API
 
 ###Issues
 - You have to obtain your own google api key.
@@ -26,3 +28,5 @@ The old one still works, but from now I will only update this version.*
 Feel free to fork it; have fun.
 
 [1]: https://github.com/yyl/android-location-tracking
+[2]: https://github.com/ddewaele/GooglePlacesApi
+[3]: https://github.com/yyl/GooglePlacesApi-sample
