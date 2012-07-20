@@ -22,7 +22,6 @@ class Locationer implements LocationListener {
 
 	private Context ctx;
 	private MyPlaces mplace;
-	private Location mLastLocation;
 	private long mLastLocationMillis;
 	private MyUtility mu;
 	
@@ -38,19 +37,18 @@ class Locationer implements LocationListener {
 	
 	@Override
 	public void onLocationChanged(Location location) {
-		Intent intent = new Intent("locationer");
+//		Intent intent = new Intent("locationer");
         if ((location == null)||(location.getAccuracy() > ACCU_THRESHOLD)) {
         	mu.appendLog(DEBUG_TAG, "location unavailable.");
         	return;
         }
         mu.appendLog(DEBUG_TAG, "onLocationChanged method invoked by " + location.getProvider());
         mLastLocationMillis = SystemClock.elapsedRealtime();
-        mLastLocation = location;
         
-        intent.putExtra("lasttime", mLastLocationMillis);
-        intent.putExtra("lat", location.getLatitude());
-        intent.putExtra("lon", location.getLongitude());
-        LocalBroadcastManager.getInstance(ctx).sendBroadcast(intent);
+//        intent.putExtra("lasttime", mLastLocationMillis);
+//        intent.putExtra("lat", location.getLatitude());
+//        intent.putExtra("lon", location.getLongitude());
+//        LocalBroadcastManager.getInstance(ctx).sendBroadcast(intent);
         
         // Do something.
         insertLocation(location);
@@ -81,12 +79,12 @@ class Locationer implements LocationListener {
         builder
         	.append("P:")
     		.append(location.getProvider()) 
-    		.append("|V:" ) 
-    		.append(location.getSpeed()) 
+//    		.append("|V:" ) 
+//    		.append(location.getSpeed()) 
     		.append("|A:" ) 
-    		.append(location.getAccuracy())
-    		.append("|D:")
-    		.append(location.getBearing());
+    		.append(location.getAccuracy());
+//    		.append("|D:")
+//    		.append(location.getBearing());
         	
         msg = builder.toString();
     	
@@ -110,12 +108,12 @@ class Locationer implements LocationListener {
 		extra = dumpLocation(location);
 		result = Double.toString(latitude)+", "+ Double.toString(longitude);
 		// get places
-//		try {
-//			places = mplace.searchPlaces(longitude, latitude, 300);
-//		} catch (Exception e) {
-//			e.printStackTrace();
-//			mu.appendLog(DEBUG_TAG, e.getMessage());
-//		}
+		try {
+			places = mplace.searchPlaces(longitude, latitude, 30);
+		} catch (Exception e) {
+			e.printStackTrace();
+			mu.appendLog(DEBUG_TAG, e.getMessage());
+		}
 		// put them into db
 		ContentValues values = new ContentValues(); 
 		values.put(LocTable.COLUMN_TIME, time); 

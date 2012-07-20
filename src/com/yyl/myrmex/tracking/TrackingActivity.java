@@ -113,8 +113,6 @@ public class TrackingActivity extends MapActivity{
     private void drawPath() {
     	mapOverlays.clear();
         Drawable drawable = this.getResources().getDrawable(R.drawable.pin);
-//        Drawable begin = this.getResources().getDrawable(R.drawable.start);
-//        Drawable end = this.getResources().getDrawable(R.drawable.end);
         MyMapOverlay itemizedoverlay = new MyMapOverlay(drawable, this);
         
         GeoPoint[] points = getPoints();

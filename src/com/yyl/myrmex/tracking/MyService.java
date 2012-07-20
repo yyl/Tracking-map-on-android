@@ -82,9 +82,9 @@ public class MyService extends Service {
 	  public void onCreate() {
 	    mNM = (NotificationManager)getSystemService(NOTIFICATION_SERVICE);
 	    mu = new MyUtility();
-	    LocalBroadcastManager.getInstance(this).registerReceiver(
-	    		gpsStatusReceiver, new IntentFilter("locationer"));
-	    
+//	    LocalBroadcastManager.getInstance(this).registerReceiver(
+//	    		gpsStatusReceiver, new IntentFilter("locationer"));
+//	    
 	    // Display a notification about us starting.  We put an icon in the status bar.
 	    showNotification();
 	    // Start up the thread running the service.  Note that we create a
