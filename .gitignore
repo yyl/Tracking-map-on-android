@@ -21,3 +21,6 @@ local.properties
 
 # Mac os specific
 .DS_Store
+
+# to filter API key
+keys.xml

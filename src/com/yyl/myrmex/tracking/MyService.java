@@ -50,13 +50,13 @@ public class MyService extends Service {
 	      @Override
 	      public void handleMessage(Message msg) {
 	          mgr = (LocationManager) getSystemService(LOCATION_SERVICE);          
-//	          Criteria criteria = new Criteria();
-//	          best = mgr.getBestProvider(criteria, true);
-	          best = LocationManager.GPS_PROVIDER;
+	          Criteria criteria = new Criteria();
+	          best = mgr.getBestProvider(criteria, true);
+//	          best = LocationManager.GPS_PROVIDER;
 	          locationer = new Locationer(getBaseContext());
 	          gpslistener = new gpsStatusListener();
 	          mgr.addGpsStatusListener(gpslistener);
-	          mgr.requestLocationUpdates(best, 15000, 5, locationer);
+	          mgr.requestLocationUpdates(best, 5000, 5, locationer);
 	      }
 	  }
 

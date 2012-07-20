@@ -6,6 +6,8 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.List;
+
+import android.content.Context;
 import android.util.Log;
 
 import com.google.api.client.googleapis.GoogleHeaders;
@@ -18,6 +20,7 @@ import com.google.api.client.http.HttpTransport;
 import com.google.api.client.http.apache.ApacheHttpTransport;
 import com.google.api.client.json.JsonObjectParser;
 import com.google.api.client.json.jackson.JacksonFactory;
+import com.yyl.myrmex.tracking.R;
 import com.yyl.myrmex.tracking.places.PlaceDetail;
 import com.yyl.myrmex.tracking.places.Place;
 import com.yyl.myrmex.tracking.places.PlacesList;
@@ -36,9 +39,13 @@ public class MyPlaces {
 	// For maximum efficiency, applications should use a single globally-shared instance of the HTTP transport.
 	private static final HttpTransport transport = new ApacheHttpTransport();
 	private static final JacksonFactory myJacksonFac = new JacksonFactory();
+	private Context ctx;
 	
+	public MyPlaces(Context context) {
+		ctx = context;
+	}
 	// Fill in the API key you want to use.
-	private static final String API_KEY = "AIzaSyBN-X539yOgMPKaBMNAMZS2z8iZx0nD-zo";
+	private String API_KEY = ctx.getResources().getString(R.string.google_api);
 
 	// The different Places API endpoints.
 	private static final String PLACES_SEARCH_URL =  
