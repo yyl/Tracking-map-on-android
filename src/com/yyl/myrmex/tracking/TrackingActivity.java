@@ -131,7 +131,7 @@ public class TrackingActivity extends MapActivity{
         mapOverlays.add(itemizedoverlay);
         
         MapController myMapController = mapView.getController();
-        myMapController.setCenter(points[0]);
+        myMapController.setCenter(points[points.length-1]);
         myMapController.setZoom(18);
     }
 	
