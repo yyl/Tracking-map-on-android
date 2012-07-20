@@ -24,7 +24,6 @@
 	android:layout_height="wrap_content" 
 	android:layout_toRightOf="@+id/timecolon" />
 
-
 <TextView
 	android:id="@+id/longcolon" 
 	android:layout_width="wrap_content" 
@@ -38,4 +37,16 @@
 	android:layout_height="wrap_content" 
 	android:layout_toRightOf="@+id/longcolon" />
 
+<TextView
+	android:id="@+id/extracolon" 
+	android:layout_width="wrap_content" 
+	android:layout_height="wrap_content" 
+	android:text="| " 
+	android:layout_toRightOf="@+id/longitude" />
+
+<TextView
+	android:id="@+id/extra" 
+	android:layout_width="wrap_content" 
+	android:layout_height="wrap_content" 
+	android:layout_toRightOf="@+id/extracolon" />
 ￼</RelativeLayout>

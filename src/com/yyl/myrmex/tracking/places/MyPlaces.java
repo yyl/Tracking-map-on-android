@@ -86,7 +86,7 @@ public class MyPlaces {
 			request.getUrl().put("sensor", "false");
 			
 			PlaceDetail place = request.execute().parseAs(PlaceDetail.class);
-			System.out.println(place);
+//			System.out.println(place);
 			return place.toString();
 
 		} catch (HttpResponseException e) {
@@ -108,40 +108,6 @@ public class MyPlaces {
 		    request.setParser(parser);
 		   }
 		});
-	}
-	
-	public void sendData(double lat, double lon) {
-		// send http request
-		String serverUrl = "http://trackmap.herokuapp.com/query";
-	    HttpClient httpclient = new DefaultHttpClient();
-	    HttpPost httppost = new HttpPost(serverUrl);
-		try {
-	        // Add your data
-	        List<NameValuePair> nameValuePairs = new ArrayList<NameValuePair>(2);
-	        nameValuePairs.add(new BasicNameValuePair("lat", Double.toString(lat)));
-	        nameValuePairs.add(new BasicNameValuePair("long", Double.toString(lon)));
-	        
-	        //
-//	        String paramString = URLEncodedUtils.format(nameValuePairs, "utf-8");
-//	        serverUrl += paramString;
-	        httppost.setEntity(new UrlEncodedFormEntity(nameValuePairs));
-	        // Execute HTTP Post Request
-//	        HttpResponse response = httpclient.execute(new HttpGet(serverUrl));
-	        HttpResponse response = httpclient.execute(httppost);
-	        Log.d(DEBUG_TAG, response.getStatusLine().getReasonPhrase());
-	        InputStream inputStream = response.getEntity().getContent();
-	        BufferedReader r = new BufferedReader(new InputStreamReader(inputStream));
-	        StringBuilder total = new StringBuilder();
-	        String line;
-	        while ((line = r.readLine()) != null) {
-	            total.append(line);
-	        }
-	        Log.d(DEBUG_TAG, total.toString());
-	    } catch (ClientProtocolException e) {
-	        // TODO Auto-generated catch block
-	    } catch (IOException e) {
-	        // TODO Auto-generated catch block
-	    }
 	}
 
 }

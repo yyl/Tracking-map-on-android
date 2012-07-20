@@ -4,17 +4,25 @@ package com.yyl.myrmex.tracking;
 import android.app.Notification;
 // for level below 11
 import android.support.v4.app.NotificationCompat;
+import android.support.v4.content.LocalBroadcastManager;
+import android.util.Log;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.app.Service;
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.location.Criteria;
+import android.location.GpsStatus;
+import android.location.GpsStatus.Listener;
 import android.location.LocationManager;
 import android.os.Handler;
 import android.os.HandlerThread;
 import android.os.IBinder;
 import android.os.Looper;
 import android.os.Message;
+import android.os.SystemClock;
 import android.widget.Toast;
 import android.os.Process;
 
@@ -22,13 +30,17 @@ public class MyService extends Service {
     private NotificationManager mNM;
     private Looper mServiceLooper;
     private ServiceHandler mServiceHandler;
-    // Unique Identification Number for the Notification.
-    // We use it on Notification start, and to cancel it.
     private int NOTIFICATION = R.string.local_service_started;
+    private boolean fixed;
+    private long last_time;
 	private LocationManager mgr;
 	private String best;
 	private Locationer locationer;
 	private NotificationCompat.Builder builder;
+	private MyUtility mu;
+	private gpsStatusListener gpslistener;
+	
+	private static final String DEBUG_TAG = "MyService";
 	
 	  // Handler that receives messages from the thread
 	  private final class ServiceHandler extends Handler {
@@ -38,17 +50,23 @@ public class MyService extends Service {
 	      @Override
 	      public void handleMessage(Message msg) {
 	          mgr = (LocationManager) getSystemService(LOCATION_SERVICE);          
-	          Criteria criteria = new Criteria();
-	          best = mgr.getBestProvider(criteria, true);
+//	          Criteria criteria = new Criteria();
+//	          best = mgr.getBestProvider(criteria, true);
+	          best = LocationManager.GPS_PROVIDER;
 	          locationer = new Locationer(getBaseContext());
-	          mgr.requestLocationUpdates(best, 30000, 0, locationer);
+	          gpslistener = new gpsStatusListener();
+	          mgr.addGpsStatusListener(gpslistener);
+	          mgr.requestLocationUpdates(best, 15000, 5, locationer);
 	      }
 	  }
 
 	  @Override
 	  public void onCreate() {
 	    mNM = (NotificationManager)getSystemService(NOTIFICATION_SERVICE);
-
+	    mu = new MyUtility();
+	    LocalBroadcastManager.getInstance(this).registerReceiver(
+	    		gpsStatusReceiver, new IntentFilter("locationer"));
+	    
 	    // Display a notification about us starting.  We put an icon in the status bar.
 	    showNotification();
 	    // Start up the thread running the service.  Note that we create a
@@ -66,7 +84,7 @@ public class MyService extends Service {
 	  @Override
 	  public int onStartCommand(Intent intent, int flags, int startId) {
 	      Toast.makeText(this, "local service is started ", Toast.LENGTH_SHORT).show();
-
+	      mu.appendLog(DEBUG_TAG, "=====tracking is started=====");
 	      // For each start request, send a message to start a job and deliver the
 	      // start ID so we know which request we're stopping when we finish the job
 	      Message msg = mServiceHandler.obtainMessage();
@@ -83,8 +101,10 @@ public class MyService extends Service {
 		  // Cancel the persistent notification.
 		  mNM.cancel(NOTIFICATION);
 		  mgr.removeUpdates(locationer);
+		  mgr.removeGpsStatusListener(gpslistener);
 	      // Tell the user we stopped.
 	      Toast.makeText(this, "local service is stopped", Toast.LENGTH_SHORT).show();
+	      mu.appendLog(DEBUG_TAG, "=====tracking is stopped=====");
 	  }
 	  
 
@@ -116,6 +136,57 @@ public class MyService extends Service {
 	        // Send the notification.
 	        mNM.notify(NOTIFICATION, notification);
 	    }
-
 	    
+	    private BroadcastReceiver gpsStatusReceiver = new BroadcastReceiver() {
+	        @Override
+	        public void onReceive(Context context, Intent intent) {
+	            // get the info from the intent we received
+	        	last_time = intent.getLongExtra("lasttime", 0);
+	        }
+	    };
+	    
+	    private class gpsStatusListener implements Listener {
+	    	
+	    	public gpsStatusListener() {
+	    	}
+	    	
+	    	@Override
+	    	public void onGpsStatusChanged(int event) {
+	    		boolean isGPSFix = false;
+	    		
+	    			switch (event) {
+	    			case GpsStatus.GPS_EVENT_SATELLITE_STATUS:
+	    				if(last_time != 0) 	{
+	    					isGPSFix = (SystemClock.elapsedRealtime() - last_time) < 10000;
+	    				}
+	            		if (isGPSFix) { // A fix has been acquired.
+	            			// Do something.
+	            			mu.appendLog(DEBUG_TAG, "GPS has a fix");
+	            			Log.d(DEBUG_TAG, "GPS has a fix");
+	            		} else { // The fix has been lost.
+	            			// Do something.
+	            			mu.appendLog(DEBUG_TAG, "GPS does not has a fix");
+	            			Log.d(DEBUG_TAG, "GPS does not have a fix");
+	            		}
+	            		
+	            		break;
+	    			case GpsStatus.GPS_EVENT_FIRST_FIX:
+	    				// Do something.
+	    				isGPSFix = true;
+	    				mu.appendLog(DEBUG_TAG, "GPS first fix");
+	    				Log.d(DEBUG_TAG, "GPS first fix");
+	    				break;
+	    			case GpsStatus.GPS_EVENT_STARTED:
+	    				mu.appendLog(DEBUG_TAG, "GPS started");
+	    				Log.i("GPS", "Started!");
+	    				break;
+	    			case GpsStatus.GPS_EVENT_STOPPED:
+	    				mu.appendLog(DEBUG_TAG, "GPS stopped");
+	    				Log.i("GPS", "Stopped");
+	    				break;
+	    			}
+	            
+	    		}
+	    	
+	    }
 }

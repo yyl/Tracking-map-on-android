@@ -1,70 +1,92 @@
 package com.yyl.myrmex.tracking;
 
-
-import java.text.SimpleDateFormat;
-import java.util.Locale;
-import java.util.TimeZone;
-
 import com.yyl.myrmex.tracking.database.LocContentProvider;
 import com.yyl.myrmex.tracking.database.LocTable;
 import com.yyl.myrmex.tracking.places.MyPlaces;
 
 import android.content.ContentValues;
 import android.content.Context;
+import android.content.Intent;
+import android.location.GpsStatus;
 import android.location.Location;
 import android.location.LocationListener;
+import android.location.LocationManager;
 import android.os.Bundle;
+import android.os.SystemClock;
+import android.support.v4.content.LocalBroadcastManager;
+import android.util.Log;
 import android.widget.Toast;
+import android.location.GpsStatus.Listener;
 
 class Locationer implements LocationListener {
 
 	private Context ctx;
-	private MyPlaces mplace;
+	private MyPlaces mplace = new MyPlaces();
+	private Location mLastLocation;
+	private long mLastLocationMillis;
+	private MyUtility mu;
+	
+	private static final String DEBUG_TAG = "Locationer";
+	private static final String[] Status = {"out of service", "temporarily unavailable", "available"};
 	
 	public Locationer(Context context) {
 		ctx = context;
+		mu = new MyUtility();
 	}
 	
 	@Override
 	public void onLocationChanged(Location location) {
-          insertLocation(location);
+		Intent intent = new Intent("locationer");
+        if (location == null) {
+        	mu.appendLog(DEBUG_TAG, "location unavailable.");
+        	return;
+        }
+        mu.appendLog(DEBUG_TAG, "onLocationChanged method invoked");
+        mLastLocationMillis = SystemClock.elapsedRealtime();
+        mLastLocation = location;
+        
+        intent.putExtra("lasttime", mLastLocationMillis);
+        intent.putExtra("lat", location.getLatitude());
+        intent.putExtra("lon", location.getLongitude());
+        LocalBroadcastManager.getInstance(ctx).sendBroadcast(intent);
+        
+        // Do something.
+        insertLocation(location);
 	}
 
 	@Override
 	public void onProviderDisabled(String provider) {
-		// TODO Auto-generated method stub
-		
+		Log.d(DEBUG_TAG, provider + " disabled.");
+		mu.appendLog(DEBUG_TAG, "onProviderDisabled method invoked ->" + provider + "disabled.");
 	}
 
 	@Override
 	public void onProviderEnabled(String provider) {
-		// TODO Auto-generated method stub
-		
+		Log.d(DEBUG_TAG, provider + " enabled.");
+		mu.appendLog(DEBUG_TAG, "onProviderEnabled method invoked ->" + provider + "enabled.");
 	}
 
 	@Override
 	public void onStatusChanged(String provider, int status, Bundle extras) {
-		// TODO Auto-generated method stub
+		Log.d(DEBUG_TAG, provider + " statu changed" + status );
+		mu.appendLog(DEBUG_TAG, "onStatusChanged method invoked ->" + provider + "changed into " + Status[status]);
 	}
 	
     /** Describe the given location, which might be null */
     private String dumpLocation(Location location) { 
     	String msg;
-    	if (location == null)
-    		msg = "Location unavailable";
-    	else
-    	{
-       		StringBuilder builder = new StringBuilder();
-        	builder
-        	.append("Prvdr:")
+       	StringBuilder builder = new StringBuilder();
+        builder
+        	.append("P:")
     		.append(location.getProvider()) 
-    		.append("|Speed:" ) 
+    		.append("|V:" ) 
     		.append(location.getSpeed()) 
-    		.append("|Accu:" ) 
-    		.append(location.getAccuracy());
+    		.append("|A:" ) 
+    		.append(location.getAccuracy())
+    		.append("|D:")
+    		.append(location.getBearing());
         	
-        	msg = builder.toString();
-    	}
+        msg = builder.toString();
     	
     	return msg;
     }
@@ -76,20 +98,22 @@ class Locationer implements LocationListener {
 		String time;
 		String extra;
 		String places = "Place:N/A";
+		String venues = "Venues:N/A";
 		String result = "Location currently unavailable.";
 		
 		// get coordinates
 		longitude = location.getLongitude();
 		latitude = location.getLatitude();
-		time = parseTime(location.getTime());
+		time = mu.parseTime(location.getTime());
 		extra = dumpLocation(location);
 		result = Double.toString(latitude)+", "+ Double.toString(longitude);
 		// get places
-		try {
-			places = mplace.searchPlaces(longitude, latitude, 300);
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
+//		try {
+//			places = mplace.searchPlaces(longitude, latitude, 300);
+//		} catch (Exception e) {
+//			e.printStackTrace();
+//			mu.appendLog(DEBUG_TAG, e.getMessage());
+//		}
 		// put them into db
 		ContentValues values = new ContentValues(); 
 		values.put(LocTable.COLUMN_TIME, time); 
@@ -97,17 +121,12 @@ class Locationer implements LocationListener {
 		values.put(LocTable.COLUMN_LONGITUDE, longitude);
 		values.put(LocTable.COLUMN_EXTRA, extra);
 		values.put(LocTable.COLUMN_PLACES, places);
+		values.put(LocTable.COLUMN_VENUES, venues);
 		ctx.getContentResolver().insert(LocContentProvider.CONTENT_URI, values);
-		
+		mu.appendLog(DEBUG_TAG, "put in value " + result + " " + extra);
 		Toast.makeText(ctx, result, Toast.LENGTH_SHORT).show();
 	}
-    
-	private String parseTime(long t) {
-		String format = "yyyy-MM-dd HH:mm:ss";
-		SimpleDateFormat sdf = new SimpleDateFormat(format, Locale.US);
-		sdf.setTimeZone(TimeZone.getTimeZone("GMT-4"));
-		String gmtTime = sdf.format(t);
-		return gmtTime;
-	}
+
+
 
 }

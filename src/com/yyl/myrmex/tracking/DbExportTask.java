@@ -18,8 +18,10 @@ public class DbExportTask extends AsyncTask<Void, Void, Boolean> {
 
 	private static final String EXPORT_FILENAME = "trackingmap";
 	private static final String LOCTABLE_PATH = "/data/com.yyl.myrmex.trackingmap/databases/loctable.db";
+	private static final String DEBUG_TAG = "DbExpoertTask";
 	private Context ctx;
 	private Calendar calendar;
+	private MyUtility mu = new MyUtility();
 	
 	public DbExportTask(Context c) {
 		ctx = c;
@@ -32,11 +34,12 @@ public class DbExportTask extends AsyncTask<Void, Void, Boolean> {
         	DatabaseExporter dbe = new DatabaseExporter(database.getReadableDatabase());
         	try {
         		calendar = Calendar.getInstance();
-        		String time = parseTime(calendar.getTimeInMillis());
+        		String time = mu.parseTime(calendar.getTimeInMillis());
 				dbe.export(Environment.getDataDirectory()+LOCTABLE_PATH, EXPORT_FILENAME + time);
 				return true;
 			} catch (IOException e) {
 				e.printStackTrace();
+				mu.appendLog(DEBUG_TAG, e.getMessage());
 				return false;
 			}
         }
@@ -49,13 +52,5 @@ public class DbExportTask extends AsyncTask<Void, Void, Boolean> {
               Toast.makeText(ctx, "Export failed", Toast.LENGTH_SHORT).show();
            }
         }
-        
-    	private String parseTime(long t) {
-    		String format = "yyyy-MM-dd-HH-mm";
-    		SimpleDateFormat sdf = new SimpleDateFormat(format, Locale.US);
-//    		DateFormat df = DateFormat.getTimeInstance(DateFormat.MEDIUM);
-    		sdf.setTimeZone(TimeZone.getTimeZone("GMT-4"));
-    		String gmtTime = sdf.format(t);
-    		return gmtTime;
-    	}
+
     }

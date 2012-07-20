@@ -6,6 +6,8 @@ import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.channels.FileChannel;
 
+import com.yyl.myrmex.tracking.MyUtility;
+
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Environment;
@@ -13,10 +15,11 @@ import android.util.Log;
 
 public class DatabaseExporter {
 
-   private static final String DATASUBDIRECTORY = "/dev_export";
+   private static final String DATASUBDIRECTORY = "/tracking";
    private static final String DEBUG_TAG = "Exporter";
    private SQLiteDatabase db;
    private TextBuilder textBuilder;
+   private MyUtility mu = new MyUtility();
 
    public DatabaseExporter(SQLiteDatabase db) {
       this.db = db;

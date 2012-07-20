@@ -32,19 +32,20 @@
                 android:layout_height="wrap_content"
                 android:text="Export" />
 
+            <Button
+                android:id="@+id/draw"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Draw" />
+
     </LinearLayout>
 
-    <TextView
-        android:id="@+id/textView1"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="Time                                 |Latitude       |Longitude" />
-    
-    <ListView
-        android:id="@+id/list"
-        android:layout_width="match_parent"
-        android:layout_height="338dp"
-        android:layout_weight="0.93" >
-
-    </ListView>
+    <com.google.android.maps.MapView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/mapview"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:clickable="true"
+    android:apiKey="0r6Vu0PY3HEjv9ECmzX1uMmFfEyzK_UNw0ajCBQ"
+	/>
 </LinearLayout>
