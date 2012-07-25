@@ -4,9 +4,11 @@
 but it has been changed drastically therefore I think it would be easier to just create another new version.
 The old one still works, but from now I will only update this version.*
 
+![Screenshot](https://github.com/yyl/Tracking-map-on-android/raw/master/Screenshot1.png "Screenshot")
+
 ###What's new 2012.07.19
 - Now be able to keep tracking indoor using Network location provider
-- Location update interval for GPS is 2s, Network is 10s
+- Location update interval for GPS is 2s, Network is 30s
 
 ###What could it do
 - start the background process to periodically track user's location (GPS enabled)
